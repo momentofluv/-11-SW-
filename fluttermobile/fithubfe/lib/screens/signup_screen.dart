@@ -5,8 +5,7 @@ import 'dart:convert';
 class SignUpScreen extends StatefulWidget {
   final VoidCallback onLoginPressed;
 
-  const SignUpScreen({Key? key, required this.onLoginPressed})
-      : super(key: key);
+  const SignUpScreen({super.key, required this.onLoginPressed});
 
   @override
   _SignUpScreenState createState() => _SignUpScreenState();
@@ -37,7 +36,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       );
 
       if (response.statusCode == 201) {
-        final snackBar = SnackBar(content: Text('가입 성공'));
+        const snackBar = SnackBar(content: Text('가입 성공'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         Navigator.pushReplacementNamed(context, '/home');
       } else {
@@ -52,7 +51,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('회원가입'),
+        title: const Text('회원가입'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -62,7 +61,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: [
               TextFormField(
                 controller: _usernameController,
-                decoration: InputDecoration(labelText: '사용자 이름'),
+                decoration: const InputDecoration(labelText: '사용자 이름'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return '사용자 이름을 입력해 주세요';
@@ -70,10 +69,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(labelText: '이메일'),
+                decoration: const InputDecoration(labelText: '이메일'),
                 keyboardType: TextInputType.emailAddress,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -85,10 +84,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(labelText: '비밀번호'),
+                decoration: const InputDecoration(labelText: '비밀번호'),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -100,14 +99,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _signup,
-                child: Text('회원가입'),
+                child: const Text('회원가입'),
               ),
               TextButton(
                 onPressed: widget.onLoginPressed,
-                child: Text('계정이 있나요? 로그인'),
+                child: const Text('계정이 있나요? 로그인'),
               ),
             ],
           ),

@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 class CommentScreen extends StatefulWidget {
   final int articleId;
 
-  CommentScreen({required this.articleId});
+  const CommentScreen({super.key, required this.articleId});
 
   @override
   _CommentScreenState createState() => _CommentScreenState();
@@ -23,7 +23,7 @@ class _CommentScreenState extends State<CommentScreen> {
 
   Future<List<dynamic>> fetchComments() async {
     final response = await http.get(Uri.parse(
-        'http://127.0.0.1:8000/community/${widget.articleId}/comment/'));
+        'http://10.0.2.2:8000/community/${widget.articleId}/comment/'));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(response.body);
@@ -37,7 +37,7 @@ class _CommentScreenState extends State<CommentScreen> {
     final content = _commentController.text;
 
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/community/${widget.articleId}/comment/'),
+      Uri.parse('http://10.0.2.2:8000/community/${widget.articleId}/comment/'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -52,17 +52,17 @@ class _CommentScreenState extends State<CommentScreen> {
         _comments = fetchComments();
       });
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Comment added')));
+          .showSnackBar(const SnackBar(content: Text('Comment added')));
     } else {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to add comment')));
+          .showSnackBar(const SnackBar(content: Text('Failed to add comment')));
     }
   }
 
   Future<void> _deleteComment(int commentId) async {
     final response = await http.delete(
       Uri.parse(
-          'http://127.0.0.1:8000/community/${widget.articleId}/comment/$commentId/'),
+          'http://10.0.2.2:8000/community/${widget.articleId}/comment/$commentId/'),
     );
 
     if (response.statusCode == 204) {
@@ -70,17 +70,17 @@ class _CommentScreenState extends State<CommentScreen> {
         _comments = fetchComments();
       });
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Comment deleted')));
+          .showSnackBar(const SnackBar(content: Text('Comment deleted')));
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to delete comment')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to delete comment')));
     }
   }
 
   Future<void> _likeComment(int commentId) async {
     final response = await http.post(
       Uri.parse(
-          'http://127.0.0.1:8000/community/${widget.articleId}/comment/$commentId/like/'),
+          'http://10.0.2.2:8000/community/${widget.articleId}/comment/$commentId/like/'),
     );
 
     if (response.statusCode == 200) {
@@ -88,10 +88,10 @@ class _CommentScreenState extends State<CommentScreen> {
         _comments = fetchComments();
       });
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Comment liked')));
+          .showSnackBar(const SnackBar(content: Text('Comment liked')));
     } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Failed to like comment')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to like comment')));
     }
   }
 
@@ -99,7 +99,7 @@ class _CommentScreenState extends State<CommentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Comments'),
+        title: const Text('Comments'),
       ),
       body: Column(
         children: [
@@ -108,11 +108,11 @@ class _CommentScreenState extends State<CommentScreen> {
               future: _comments,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No comments yet'));
+                  return const Center(child: Text('No comments yet'));
                 }
 
                 final comments = snapshot.data!;
@@ -122,28 +122,29 @@ class _CommentScreenState extends State<CommentScreen> {
                   itemBuilder: (context, index) {
                     final comment = comments[index];
                     return ListTile(
-                      title: Text(comment['user']),
+                      title:
+                          Text(comment['user']['username'] ?? 'Unknown user'),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(comment['content']),
-                          SizedBox(height: 8.0),
+                          Text(comment['content'] ?? ''),
+                          const SizedBox(height: 8.0),
                           if (comment['image'] != null)
                             Image.network(comment['image']),
-                          SizedBox(height: 8.0),
-                          Text('Updated: ${comment['updated_at']}'),
+                          const SizedBox(height: 8.0),
+                          Text('Updated: ${comment['updated_at'] ?? 'N/A'}'),
                         ],
                       ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.thumb_up),
+                            icon: const Icon(Icons.thumb_up),
                             onPressed: () => _likeComment(comment['id']),
                           ),
                           Text(comment['likes_count'].toString()),
                           IconButton(
-                            icon: Icon(Icons.delete),
+                            icon: const Icon(Icons.delete),
                             onPressed: () => _deleteComment(comment['id']),
                           ),
                         ],
@@ -172,14 +173,14 @@ class _CommentScreenState extends State<CommentScreen> {
                 Expanded(
                   child: TextField(
                     controller: _commentController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Write a comment...',
                       border: OutlineInputBorder(),
                     ),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: const Icon(Icons.send),
                   onPressed: _postComment,
                 ),
               ],
@@ -195,11 +196,22 @@ class CommentDetailScreen extends StatelessWidget {
   final int commentId;
   final int articleId;
 
-  CommentDetailScreen({required this.commentId, required this.articleId});
+  const CommentDetailScreen(
+      {super.key, required this.commentId, required this.articleId});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'FitHUB',
+          style: TextStyle(
+            fontFamily: 'logo',
+            fontSize: 24, // Example of adding more style properties
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: Center(
         child: Text('Detail for Comment ID: $commentId'),
       ),

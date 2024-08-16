@@ -60,12 +60,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Username: ${userProfile.username}',
+                  'Username: ${userProfile.username ?? 'N/A'}',
                   style: const TextStyle(
                       fontSize: 22, fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  'Email: ${userProfile.email}',
+                  'Email: ${userProfile.email ?? 'N/A'}',
                   style: const TextStyle(fontSize: 18),
                 ),
                 const SizedBox(height: 16),
@@ -86,8 +86,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 ...userProfile.articleSet.map((article) => ListTile(
-                      title: Text(article.content),
-                      subtitle: Text('Created at: ${article.createdAt}'),
+                      title: Text(article.content ?? 'No content'),
+                      subtitle:
+                          Text('Created at: ${article.createdAt ?? 'N/A'}'),
                     )),
                 const SizedBox(height: 16),
                 const Text(
@@ -95,8 +96,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 ...userProfile.likeArticles.map((article) => ListTile(
-                      title: Text(article.content),
-                      subtitle: Text('Created at: ${article.createdAt}'),
+                      title: Text(article.content ?? 'No content'),
+                      subtitle:
+                          Text('Created at: ${article.createdAt ?? 'N/A'}'),
                     )),
               ],
             ),

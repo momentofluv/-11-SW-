@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class CreateArticleScreen extends StatefulWidget {
+  const CreateArticleScreen({super.key});
+
   @override
   _CreateArticleScreenState createState() => _CreateArticleScreenState();
 }
@@ -16,7 +18,7 @@ class _CreateArticleScreenState extends State<CreateArticleScreen> {
       final content = _contentController.text;
 
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:8000/community/'),
+        Uri.parse('http://10.0.2.2:8000/community/'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -27,12 +29,12 @@ class _CreateArticleScreenState extends State<CreateArticleScreen> {
       );
 
       if (response.statusCode == 201) {
-        final snackBar =
+        const snackBar =
             SnackBar(content: Text('Article created successfully'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
         Navigator.pop(context, true);
       } else {
-        final snackBar = SnackBar(content: Text('Failed to create article'));
+        const snackBar = SnackBar(content: Text('Failed to create article'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     }
@@ -42,7 +44,7 @@ class _CreateArticleScreenState extends State<CreateArticleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Article'),
+        title: const Text('Create Article'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -53,7 +55,7 @@ class _CreateArticleScreenState extends State<CreateArticleScreen> {
             children: [
               TextFormField(
                 controller: _contentController,
-                decoration: InputDecoration(labelText: 'Content'),
+                decoration: const InputDecoration(labelText: 'Content'),
                 maxLines: 5,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -62,10 +64,10 @@ class _CreateArticleScreenState extends State<CreateArticleScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _createArticle,
-                child: Text('Create'),
+                child: const Text('Create'),
               ),
             ],
           ),

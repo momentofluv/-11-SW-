@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../models/article.dart';
 import '../models/user.dart';
 import 'comment_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ArticleScreen extends StatefulWidget {
   const ArticleScreen({super.key});
@@ -28,50 +29,71 @@ class _ArticleScreenState extends State<ArticleScreen> {
       _isLoading = true;
     });
 
-    final response =
-        await http.get(Uri.parse('http://10.0.2.2:8000/community/'));
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs
+          .getString('access_token'); // Retrieve token from SharedPreferences
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      setState(() {
-        _articles = data.map((item) => Article.fromJson(item)).toList();
-        _isLoading = false;
-      });
-    } else {
-      setState(() {
-        _isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to load articles')),
+      final response = await http.get(
+        Uri.parse('http://10.0.2.2:8000/community/'),
+        headers: token != null ? {'Authorization': 'Bearer $token'} : {},
       );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        setState(() {
+          _articles = data.map((item) => Article.fromJson(item)).toList();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to load articles')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Exception: ${e.toString()}')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
   Future<void> _likeArticle(int articleId, bool isLikedByUser) async {
-    final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/community/$articleId/like/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs
+          .getString('access_token'); // Retrieve token from SharedPreferences
 
-    if (response.statusCode == 200) {
-      // Refresh articles to reflect the like status
-      _fetchArticles(); // Updated method to fetch articles again
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Article liked')));
-      }
-    } else {
-      if (mounted) {
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:8000/community/$articleId/like/'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          if (token != null)
+            'Authorization':
+                'Bearer $token', // Include token in the request header
+        },
+      );
+
+      if (response.statusCode == 200) {
+        _fetchArticles(); // Refresh articles to reflect the like status
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to like article')));
+          const SnackBar(content: Text('Article liked')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to like article')),
+        );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Exception: ${e.toString()}')),
+      );
     }
   }
 
   void _editArticle(int articleId) {
-    // Navigate to the edit screen (assumes you have a route for editing)
     Navigator.pushNamed(context, '/edit_article', arguments: articleId)
         .then((result) {
       if (result == true) {
@@ -81,24 +103,35 @@ class _ArticleScreenState extends State<ArticleScreen> {
   }
 
   Future<void> _deleteArticle(int articleId) async {
-    final response = await http.delete(
-      Uri.parse('http://10.0.2.2:8000/community/$articleId/'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-    );
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? token = prefs
+          .getString('access_token'); // Retrieve token from SharedPreferences
 
-    if (response.statusCode == 204) {
-      _fetchArticles(); // Refresh articles after deletion
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Article deleted')));
-      }
-    } else {
-      if (mounted) {
+      final response = await http.delete(
+        Uri.parse('http://10.0.2.2:8000/community/$articleId/'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          if (token != null)
+            'Authorization':
+                'Bearer $token', // Include token in the request header
+        },
+      );
+
+      if (response.statusCode == 204) {
+        _fetchArticles(); // Refresh articles after deletion
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to delete article')));
+          const SnackBar(content: Text('Article deleted')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to delete article')),
+        );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Exception: ${e.toString()}')),
+      );
     }
   }
 
@@ -106,7 +139,15 @@ class _ArticleScreenState extends State<ArticleScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Articles'),
+        title: const Text(
+          'FitHUB',
+          style: TextStyle(
+            fontFamily: 'logo',
+            fontSize: 24, // Example of adding more style properties
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -169,7 +210,7 @@ class _ArticleScreenState extends State<ArticleScreen> {
                           const SizedBox(height: 10),
                           Text('Updated at: ${_formatDate(article.updatedAt)}'),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.comment),
@@ -182,8 +223,8 @@ class _ArticleScreenState extends State<ArticleScreen> {
                               IconButton(
                                 icon: Icon(
                                   article.isLikedByUser
-                                      ? Icons.favorite
-                                      : Icons.favorite_border,
+                                      ? Icons.favorite_border
+                                      : Icons.favorite,
                                   color:
                                       article.isLikedByUser ? Colors.red : null,
                                 ),

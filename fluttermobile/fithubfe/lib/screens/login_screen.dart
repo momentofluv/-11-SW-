@@ -23,6 +23,9 @@ class _LoginScreenState extends State<LoginScreen> {
       final email = _emailController.text;
       final password = _passwordController.text;
 
+      print(
+          'Attempting to login with email: $email and password: $password'); // 디버깅
+
       setState(() {
         _isLoading = true;
       });
@@ -45,33 +48,47 @@ class _LoginScreenState extends State<LoginScreen> {
 
         if (response.statusCode == 200) {
           final responseBody = json.decode(response.body);
-          final String token = responseBody[
-              'token']; // Assuming the token is returned in the 'token' field
 
-          // Save the token using SharedPreferences
-          final SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString('auth_token', token);
+          // Get access and refresh tokens
+          final String? accessToken = responseBody['access'];
+          final String? refreshToken = responseBody['refresh'];
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('로그인 성공')),
-          );
+          if (accessToken == null || refreshToken == null) {
+            print('Access or refresh token is null'); // 디버깅
+            throw Exception('Tokens not found in response');
+          } else {
+            // Save tokens using SharedPreferences
+            final SharedPreferences prefs =
+                await SharedPreferences.getInstance();
+            await prefs.setString('access_token', accessToken);
+            await prefs.setString('refresh_token', refreshToken);
 
-          Navigator.pushReplacementNamed(context, '/home');
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('로그인 성공')),
+              );
+              Navigator.pushReplacementNamed(context, '/home');
+            }
+          }
         } else {
           final errorMessage =
               json.decode(response.body)['message'] ?? 'Unknown error';
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $errorMessage')),
-          );
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: $errorMessage')),
+            );
+          }
         }
       } catch (e) {
         setState(() {
           _isLoading = false;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Exception: ${e.toString()}')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Exception: ${e.toString()}')),
+          );
+        }
       }
     }
   }

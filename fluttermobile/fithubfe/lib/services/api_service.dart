@@ -4,14 +4,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final String baseUrl = 'http://127.0.0.1:8000/'; // Django 서버 URL
+  final String baseUrl = 'http://10.0.2.2:8000/'; // Django 서버 URL
   Map<String, dynamic> _handleResponse(http.Response response) {
     if (response.statusCode == 200 || response.statusCode == 201) {
       // Successful response
       try {
         return jsonDecode(response.body);
       } catch (e) {
-        throw FormatException('Failed to decode JSON');
+        throw const FormatException('Failed to decode JSON');
       }
     } else {
       // Handle error response
