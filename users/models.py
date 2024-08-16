@@ -43,7 +43,7 @@ class User(AbstractBaseUser):
     email = models.EmailField(default='', max_length=50, unique=True)
     username = models.CharField(default='', max_length=30, unique=True)
     is_expert = models.BooleanField(default=False)
-
+    profile_image = models.CharField(max_length=100, default='write.png')
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     following = models.ManyToManyField('self', symmetrical=False, related_name='followers', blank=True)

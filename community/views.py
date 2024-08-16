@@ -118,13 +118,3 @@ class LikeView(APIView):
             return Response("좋아요 했습니다.", status=status.HTTP_200_OK)
 
 
-class FeedView:
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request):
-        q = Q()
-        for user in request.user.followings.all():
-            q.add(Q(user=user), q.OR)
-        feeds = Article.objects.filter(q)
-        serializer = ArticleListSerializer(feeds, many=True)
-        return Response(serializer.data)

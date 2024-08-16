@@ -7,6 +7,9 @@ from rest_framework_simplejwt.views import (
 
 urlpatterns = [
     path('signup/', views.UserView.as_view(), name='user_view'),
+    path('login/', views.UserLoginView.as_view(), name='user_login'),
+    path('logout/', views.UserLogoutView.as_view(), name='user_logout'),
+
     path('mock/', views.MockView.as_view(), name='mock_view'),
     #JWT 인증 사용
     path('api/token/', views.CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),

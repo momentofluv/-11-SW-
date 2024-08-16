@@ -4,7 +4,7 @@ DATABASES = {
         'NAME': 'fithubdb',#db명
         'USER': 'root', #db user 이름
         'PASSWORD': '12345678', #db password
-        'HOST': 'mysql', #나중에 aws로 연결
+        'HOST': 'localhost', #나중에 aws로 연결
         'PORT': '3306', #mysql 포트번호
     }
 }

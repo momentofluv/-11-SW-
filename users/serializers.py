@@ -41,11 +41,19 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     #팔로워
-    followers = serializers.StringRelatedField(many=True)
+    followers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     #사용자가 작성한 글들 확인
     article_set = ArticleListSerializer(many=True)
     #사용자가 좋아요한 글들 확인
     like_articles = ArticleListSerializer(many=True)
+
+    def get_follower_count(self, obj):
+        return obj.followers.count()
+
+    def get_following_count(self, obj):
+        return obj.following.count()
+
+
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'following', 'followers', 'article_set', 'like_articles')
+        fields = ('id', 'email', 'username', 'following', 'followers', 'article_set', 'like_articles', 'profile_image')
